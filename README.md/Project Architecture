@@ -1,0 +1,1 @@
+We create a dataware house in the initial stage using Madeline architecture (Bronze, Silver and Gold Layer) using SQL server where we can store the raw data and carry out the ETL process before loading it into Power BI.
