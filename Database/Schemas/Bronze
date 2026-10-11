@@ -1,0 +1,29 @@
+
+Table Creation in Bronze Schemas:imobile_data
+
+Query:
+CREATE TABLE bronze.imobile_data
+(
+value_date varchar(50),
+transaction_date varchar(50),
+transaction_remarks varchar(150),
+withdrawal decimal(10,2),
+deposit decimal(10,2),
+balance decimal(10,2)
+);
+
+
+Table Creation in Bronze Schemas:gpay_datanew
+
+Query:
+CREATE TABLE bronze.gpay_datanew
+(
+transaction_date varchar(50),
+transaction_id varchar(50),
+description_ varchar(100),
+product_ varchar(100),
+payment_method varchar (100),
+status_ varchar(50),
+amount INT
+);
+
