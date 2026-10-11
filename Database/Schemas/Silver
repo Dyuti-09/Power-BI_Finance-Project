@@ -1,0 +1,84 @@
+
+PRINT 'CREATING AND DEFINING imobile_data Table in SILVER LAYER'
+
+IF OBJECT_ID('silver.imobile_data','U') IS NOT NULL
+DROP TABLE silver.imobile_data;
+
+CREATE TABLE silver.imobile_data 
+(
+
+transaction_date date,
+transaction_remarks varchar(150),
+withdrawal decimal(10,2),
+deposit decimal(10,2),
+balance decimal(10,2),
+dwh_create_date DATETIME2 DEFAULT GETDATE() --Defining Table Structure: Data Definition Language
+);
+
+PRINT 'INSERTING TRANSFORMED DATA from Broze.imobile_data Table to silver.imobile_data Table'
+INSERT INTO silver.imobile_data(
+transaction_date,
+transaction_remarks,
+withdrawal,
+deposit,
+balance)
+SELECT 
+CONVERT(date,transaction_date,103) AS 'transaction_date', --Converted date from text to date type: Data standardization
+transaction_remarks,
+withdrawal,
+deposit,
+balance
+FROM(
+SELECT
+*,
+ROW_NUMBER() OVER (PARTITION BY transaction_remarks ORDER BY transaction_date) as flag_last
+FROM bronze.imobile_data)t
+WHERE flag_last = 1 AND
+Datediff (day,
+CONVERT(date,value_date,103),
+CONVERT(date,transaction_date,103)) = 0
+ORDER BY transaction_date ASC; --Removing duplicate ID : data enrichment
+
+
+PRINT 'CREATING AND DEFINING TABLE gpay_datanew in SILVER LAYER'
+
+IF OBJECT_ID('silver.gpay_datanew','U') IS NOT NULL
+DROP TABLE silver.gpay_datanew;
+
+CREATE TABLE silver.gpay_datanew
+(
+transaction_date date,
+transaction_id varchar(50),
+description_ varchar(100),
+product_ varchar(100),
+payment_method varchar (100),
+status_ varchar(50),
+amount decimal(10,2),
+dwh_create_date DATETIME2 DEFAULT GETDATE()
+);
+PRINT 'INSERTING TRANSFORMED TABLE INTO silver.gpay_datanew'
+
+INSERT INTO silver.gpay_datanew(
+transaction_date,
+transaction_id,
+description_,
+product_,
+payment_method,
+status_,
+amount)
+
+SELECT
+CONVERT(date,transaction_date,103) AS transaction_date, --Converted date from text to date type: Data standardization
+transaction_id,
+description_,
+product_,
+payment_method,
+status_,
+CONVERT(decimal(10,2),amount) AS amount --Converted amount from int to decimal type: Data standardization
+FROM (
+SELECT*,
+ROW_NUMBER() OVER (PARTITION BY transaction_id ORDER BY transaction_date) as flag_first
+FROM
+bronze.gpay_datanew)t
+WHERE flag_first = 1
+ORDER BY transaction_date ASC; --Removing duplicate ID : data enrichment
