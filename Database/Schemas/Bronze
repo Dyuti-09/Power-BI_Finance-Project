@@ -27,3 +27,27 @@ status_ varchar(50),
 amount INT
 );
 
+BULK INSERT IN Bronze layer:
+-----------------------------------------------------------------
+PRINT 'INSERTING DATA INTO imobile_data TABLE';
+
+		BULK INSERT bronze.imobile_data --Bulk insert in Bronze Layer
+		FROM 'C:\Users\Dyuti Mazumder\Downloads\Net Banking Data\imobile_datacsv.csv'
+		WITH
+		(
+		FIRSTROW = 2,
+		FIELDTERMINATOR = ',',
+		TABLOCK
+		);
+
+PRINT 'INSERTING DATA INTO gpay_datanew TABLE';
+
+		BULK INSERt bronze.gpay_datanew
+		FROM 'C:\Users\Dyuti Mazumder\Downloads\Net Banking Data\Gpay_data.csv'
+		WITH
+		(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+			);
+
